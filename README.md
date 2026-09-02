@@ -20,7 +20,7 @@
 
 ## 1. 安装与启动
 
-1. 从官网下载对应平台的安装包（macOS `.dmg` / Windows `.exe` / Linux `.AppImage`）。
+1. 从[官网](https://www.pyrelle.asia)或 Github Pyrelle release下载对应平台的安装包（macOS `.dmg` / Windows `.exe` / Linux `.AppImage`）。
 2. 双击安装并打开 Pyrelle。
 3. 首次启动会自动拉起内置的后端服务（终端窗口会显示初始化日志），等待状态栏出现「Ready」即可使用。
 
