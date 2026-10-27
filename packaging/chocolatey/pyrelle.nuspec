@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>pyrelle</id>
+    <version>2.1.15</version>
+    <title>Pyrelle</title>
+    <authors>Beijing Xibei Technology Co., Ltd.</authors>
+    <owners>Beijing Xibei Technology Co., Ltd.</owners>
+    <projectUrl>https://github.com/rockyCheung/Pyrelle</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/rockyCheung/Pyrelle/master/frontend/resources/icons/icon.ico</iconUrl>
+    <copyright>Copyright (c) Beijing Xibei Technology Co., Ltd.</copyright>
+    <licenseUrl>https://pyrelle.asia/privacy</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/rockyCheung/Pyrelle</projectSourceUrl>
+    <docsUrl>https://github.com/rockyCheung/Pyrelle</docsUrl>
+    <description>Pyrelle is an AI-powered development assistant. Chat, pair-programming and fully autonomous task execution in one tool: read/write project files, run build/test verification, manage task kanban, and retrieve project context via local vector indexing.</description>
+    <summary>AI development assistant: chat, pair-programming and autonomous execution.</summary>
+    <tags>ai developer assistant coding ide autopilot</tags>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

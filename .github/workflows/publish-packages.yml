@@ -1,0 +1,101 @@
+name: Publish Packages (Scoop & Chocolatey)
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 2.1.15)'
+        required: true
+        type: string
+
+env:
+  # 去掉 v 前缀的版本号
+  VERSION: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.version }}
+
+jobs:
+  scoop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Normalize version
+        run: |
+          V="${VERSION#v}"
+          echo "VERSION=$V" >> $GITHUB_ENV
+
+      - name: Download signed installer
+        run: |
+          curl -fL -o setup.exe "https://github.com/rockyCheung/Pyrelle/releases/download/v${VERSION}/Pyrelle%20Setup%20${VERSION}.exe"
+
+      - name: Compute SHA256
+        id: hash
+        run: echo "sha256=$(sha256sum setup.exe | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Update Scoop manifest
+        run: |
+          sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" packaging/scoop/pyrelle.json
+          sed -i "s#/v[0-9.]*/Pyrelle%20Setup%20[0-9.]*\.exe#/v$VERSION/Pyrelle%20Setup%20$VERSION.exe#g" packaging/scoop/pyrelle.json
+          sed -i "s/\"hash\": \".*\"/\"hash\": \"${{ steps.hash.outputs.sha256 }}\"/" packaging/scoop/pyrelle.json
+
+      - name: Push to Scoop bucket
+        env:
+          BUCKET_REPO: ${{ secrets.SCOOP_BUCKET_REPO }}
+          BUCKET_PAT: ${{ secrets.SCOOP_BUCKET_PAT }}
+        run: |
+          if [ -z "$BUCKET_REPO" ]; then echo "SCOOP_BUCKET_REPO not set; skip push"; exit 0; fi
+          git clone "https://x-access-token:${BUCKET_PAT}@github.com/${BUCKET_REPO}.git" bucket
+          cp packaging/scoop/pyrelle.json bucket/
+          cd bucket
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add pyrelle.json
+          git commit -m "Pyrelle $VERSION" || echo "no changes"
+          git push
+
+  chocolatey:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Normalize version
+        shell: pwsh
+        run: |
+          $v = "$env:VERSION" -replace '^v',''
+          echo "VERSION=$v" >> $env:GITHUB_ENV
+
+      - name: Download signed installer
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/rockyCheung/Pyrelle/releases/download/v${env:VERSION}/Pyrelle%20Setup%20${env:VERSION}.exe" -OutFile setup.exe
+
+      - name: Compute SHA256
+        id: hash
+        shell: pwsh
+        run: |
+          $h = (Get-FileHash setup.exe -Algorithm SHA256).Hash.ToLower()
+          echo "sha256=$h" >> $env:GITHUB_OUTPUT
+
+      - name: Patch chocolatey package
+        shell: pwsh
+        run: |
+          (Get-Content packaging/chocolatey/pyrelle.nuspec -Raw) -replace '<version>.*</version>', "<version>$env:VERSION</version>" | Set-Content packaging/chocolatey/pyrelle.nuspec
+          (Get-Content packaging/chocolatey/tools/chocolateyinstall.ps1 -Raw) `
+            -replace "\`$version = '.*'", "`$version = '$env:VERSION'" `
+            -replace "\`$checksum = '.*'", "`$checksum = '${{ steps.hash.outputs.sha256 }}'" |
+            Set-Content packaging/chocolatey/tools/chocolateyinstall.ps1
+
+      - name: Build nupkg
+        shell: pwsh
+        run: |
+          cd packaging/chocolatey
+          choco pack pyrelle.nuspec
+
+      - name: Push to Chocolatey
+        shell: pwsh
+        env:
+          CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
+        run: |
+          if (-not $env:CHOCO_API_KEY) { Write-Host "CHOCO_API_KEY not set; skip push"; exit 0 }
+          choco push packaging/chocolatey/pyrelle.$env:VERSION.nupkg --api-key $env:CHOCO_API_KEY
