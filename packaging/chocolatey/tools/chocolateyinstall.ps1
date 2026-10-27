@@ -4,7 +4,7 @@ $toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 
 # These values are replaced by the CI workflow (publish-packages.yml) before packing.
 $version = '2.1.15'
-$url = "https://github.com/rockyCheung/Pyrelle/releases/download/v$version/Pyrelle%20Setup%20$version.exe"
+$url = "https://github.com/rockyCheung/Pyrelle/releases/download/v$version/Pyrelle.Setup.$version.exe"
 $checksum = 'REPLACE_WITH_SHA256'
 
 $packageArgs = @{

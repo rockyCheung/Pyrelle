@@ -27,7 +27,7 @@ jobs:
 
       - name: Download signed installer
         run: |
-          curl -fL -o setup.exe "https://github.com/rockyCheung/Pyrelle/releases/download/v${VERSION}/Pyrelle%20Setup%20${VERSION}.exe"
+          curl -fL -o setup.exe "https://github.com/rockyCheung/Pyrelle/releases/download/v${VERSION}/Pyrelle.Setup.${VERSION}.exe"
 
       - name: Compute SHA256
         id: hash
@@ -36,7 +36,7 @@ jobs:
       - name: Update Scoop manifest
         run: |
           sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" packaging/scoop/pyrelle.json
-          sed -i "s#/v[0-9.]*/Pyrelle%20Setup%20[0-9.]*\.exe#/v$VERSION/Pyrelle%20Setup%20$VERSION.exe#g" packaging/scoop/pyrelle.json
+          sed -i "s#releases/download/v[0-9.]*/Pyrelle\.Setup\.[0-9.]*\.exe#releases/download/v$VERSION/Pyrelle.Setup.$VERSION.exe#g" packaging/scoop/pyrelle.json
           sed -i "s/\"hash\": \".*\"/\"hash\": \"${{ steps.hash.outputs.sha256 }}\"/" packaging/scoop/pyrelle.json
 
       - name: Push to Scoop bucket
@@ -68,7 +68,7 @@ jobs:
       - name: Download signed installer
         shell: pwsh
         run: |
-          Invoke-WebRequest -Uri "https://github.com/rockyCheung/Pyrelle/releases/download/v${env:VERSION}/Pyrelle%20Setup%20${env:VERSION}.exe" -OutFile setup.exe
+          Invoke-WebRequest -Uri "https://github.com/rockyCheung/Pyrelle/releases/download/v${env:VERSION}/Pyrelle.Setup.${env:VERSION}.exe" -OutFile setup.exe
 
       - name: Compute SHA256
         id: hash
