@@ -24,11 +24,10 @@
 2. 双击安装并打开 Pyrelle。
 3. 首次启动会自动拉起内置的后端服务（终端窗口会显示初始化日志），等待状态栏出现「Ready」即可使用。
 4. 指令scoop安装
-
-`
-scoop bucket add pyrelle https://github.com/rockyCheung/scoop-bucket
+```bash
+dscoop bucket add pyrelle https://github.com/rockyCheung/scoop-bucket
 scoop install pyrelle
-`
+```
 
 > macOS 首次打开若提示「无法验证开发者」，请在「系统设置 → 隐私与安全性」中点击「仍要打开」。
 
