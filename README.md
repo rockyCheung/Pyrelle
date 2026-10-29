@@ -25,7 +25,7 @@
 3. 首次启动会自动拉起内置的后端服务（终端窗口会显示初始化日志），等待状态栏出现「Ready」即可使用。
 4. 指令scoop安装
 ```bash
-dscoop bucket add pyrelle https://github.com/rockyCheung/scoop-bucket
+scoop bucket add pyrelle https://github.com/rockyCheung/scoop-bucket
 scoop install pyrelle
 ```
 
